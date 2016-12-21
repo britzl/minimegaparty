@@ -1,3 +1,5 @@
+go.property("music_volume", 0.3)
+
 local flow = require "ludobits.m.flow"
 local input = require "ludobits.m.input"
 local broadcast = require "ludobits.m.broadcast"
@@ -18,13 +20,25 @@ local function shuffle(t)
 	return t
 end
 
+local function fade_out_music(duration)
+	go.animate("#", "music_volume", go.PLAYBACK_ONCE_FORWARD, 0.5, go.EASING_LINEAR, duration or 1)
+end
+
+
+local function fade_in_music(duration)
+	go.animate("#", "music_volume", go.PLAYBACK_ONCE_FORWARD, 1.0, go.EASING_LINEAR, duration or 1)
+end
+
 
 function init(self)
 	math.randomseed(os.time())
 	input.acquire()
 	
+	msg.post("#music", "play_sound", { delay = 0, gain = 1.0 })
+
 	flow(function()
 		flow.load("#select_players_proxy")
+		fade_out_music()
 		local message_id, message, sender = flow.until_message(hash("players_selected"))
 		local players = message
 		flow.unload("#select_players_proxy")
@@ -33,6 +47,7 @@ function init(self)
 			pprint(GAMES)
 			for _, game in ipairs(GAMES) do
 				flow.load(game.proxy)
+				fade_in_music()
 				msg.post(game.script, "start", players)
 				local message_id, message, sender = flow.until_message(hash("game_over"))
 				players = message
@@ -44,6 +59,7 @@ function init(self)
 				flow.unload(game.proxy)
 	
 				flow.load("#scoreboard_proxy")
+				fade_out_music()
 				msg.post("scoreboard:/scoreboard", "players", players)
 				flow.until_message(hash("next_game"))
 				flow.unload("#scoreboard_proxy")
@@ -60,6 +76,7 @@ end
 function update(self, dt)
 	flow.update(dt)
 	msg.post("@render:", "clear_color", { color = vmath.vector4(95 /256, 129 / 256, 161 / 256, 1 ) })
+	msg.post("#music", "set_gain", { delay = 0, gain = self.music_volume })
 end
 
 function on_message(self, message_id, message, sender)

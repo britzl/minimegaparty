@@ -35,6 +35,8 @@ function on_input(self, action_id, action)
 					score = 0,
 				}
 				table.insert(self.players, player)
+				msg.post("#playerjoinsound", "play_sound", { delay = 0, gain = 1.0 })
+				
 				
 				label.set_text("player" .. player.player_id .. "#action", action_name)
 				go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)

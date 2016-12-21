@@ -37,6 +37,46 @@ embedded_instances {
   "  }\n"
   "}\n"
   "embedded_components {\n"
+  "  id: \"cannonsound\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/shoot.wav\\\"\\n"
+  "looping: 0\\n"
+  "group: \\\"master\\\"\\n"
+  "gain: 1.0\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"hitsound\"\n"
+  "  type: \"sound\"\n"
+  "  data: \"sound: \\\"/assets/sounds/explosion.wav\\\"\\n"
+  "looping: 0\\n"
+  "group: \\\"master\\\"\\n"
+  "gain: 1.0\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  "embedded_components {\n"
   "  id: \"instructions\"\n"
   "  type: \"label\"\n"
   "  data: \"size {\\n"
@@ -784,7 +824,7 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 112.2904
+    x: 120.34636
     y: 222.37453
     z: 0.0
   }
@@ -878,7 +918,7 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 183.88058
+    x: 188.86761
     y: 223.00696
     z: 0.0
   }
@@ -972,7 +1012,7 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 243.06245
+    x: 252.26927
     y: 223.00696
     z: 0.0
   }

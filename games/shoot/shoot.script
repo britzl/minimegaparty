@@ -23,6 +23,7 @@ function update(self, dt)
 				go.delete("bullet" .. i)
 				go.delete("target" .. i)
 				player.win = true
+				msg.post("#hitsound", "play_sound", { delay = 0, gain = 1.0 })
 			end
 		end
 	end
@@ -56,6 +57,7 @@ function on_input(self, action_id, action)
 			if player.action_id == action_id and not player.shoot then
 				player.shoot = true
 				go.animate("bullet" .. i, "position.y", go.PLAYBACK_ONCE_FORWARD, 800, go.EASING_LINEAR, 2, 0)
+				msg.post("#cannonsound", "play_sound", { delay = 0, gain = 1.0 })
 			end
 		end
 	end
