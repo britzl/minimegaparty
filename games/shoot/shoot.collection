@@ -74,7 +74,7 @@ embedded_instances {
   "pivot: PIVOT_CENTER\\n"
   "blend_mode: BLEND_MODE_ALPHA\\n"
   "line_break: false\\n"
-  "text: \\\"SHOOT\\\"\\n"
+  "text: \\\"SHOOT!\\\"\\n"
   "font: \\\"/assets/font/smallest_pixel-7.font\\\"\\n"
   "material: \\\"/assets/font/font.material\\\"\\n"
   "\"\n"

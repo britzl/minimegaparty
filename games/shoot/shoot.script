@@ -36,7 +36,6 @@ function on_message(self, message_id, message, sender)
 		for _,player in ipairs(self.players) do
 			player.win = false
 			player.shoot = false
-			player.id = hash("/player" .. player.player_id)
 			label.set_text("player" .. player.player_id .. "#action", player.action_name)
 			go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
 		end

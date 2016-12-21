@@ -1,0 +1,107 @@
+local input = require "ludobits.m.input"
+local flow = require "ludobits.m.flow"
+
+
+local function animate_first_box(self, player_id)
+	local first_box = self.boxes[player_id][1]
+	assert(first_box)
+	msg.post(msg.url(nil, first_box, "sprite"), "enable")
+	local pos = go.get_position(first_box)
+	pos.x = pos.x + math.random(0, 20)
+	go.set_position(pos, first_box)
+	go.animate(first_box, "position.x", go.PLAYBACK_LOOP_PINGPONG, go.get_position(first_box).x - 30, go.EASING_INOUTQUAD, 1, math.random(1, 1) / 10)
+end
+
+local function drop_first_box(self, player_id)
+	local first_box = table.remove(self.boxes[player_id], 1)
+	assert(first_box)
+	msg.post(first_box, "enable")
+	go.cancel_animations(first_box, "position.x")
+	if #self.boxes[player_id] > 0 then
+		animate_first_box(self, player_id)
+	end
+end
+
+function init(self)
+	self.players = {}
+	self.boxes = {
+		{ "block1_p1", "block2_p1", "block3_p1", "block4_p1",  },
+		{ "block1_p2", "block2_p2", "block3_p2", "block4_p2",  },
+		{ "block1_p3", "block2_p3", "block3_p3", "block4_p3",  },
+		{ "block1_p4", "block2_p4", "block3_p4", "block4_p4",  },
+	}
+	
+	for _,player_boxes in pairs(self.boxes) do
+		for _,box in pairs(player_boxes) do
+			msg.post(box, "disable")
+		end
+	end
+
+	--msg.post(".", "start", { { action_id = hash("KEY_Q"), player_id = 1, action_name = "Q" } })
+end
+
+function final(self)
+	input.release()
+end
+
+function update(self, dt)
+	flow.update(dt)
+end
+
+function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
+	if message_id == hash("start") then
+		input.acquire()
+		self.players = message
+		for i,player in ipairs(self.players) do
+			player.win = false
+			label.set_text("player" .. player.player_id .. "#action", player.action_name)
+			go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
+			animate_first_box(self, player.player_id)
+		end
+		for i=#self.players+1,4 do
+			go.delete("player" .. i)
+			for _,box in pairs(self.boxes[i]) do
+				go.delete(box)
+			end
+			self.boxes[i] = nil
+		end
+	elseif message_id == hash("trigger_response") then
+		for _,player in pairs(self.players) do
+			if message.other_id == hash("block4_p" .. player.player_id) then
+				if message.enter then
+					player.win = true
+				elseif message.exit then
+					player.win = false
+				end
+			end
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.released then
+		for i,player in pairs(self.players) do
+			if player.action_id == action_id then
+				if #self.boxes[player.player_id] > 0 then
+					drop_first_box(self, player.player_id)
+				end
+			end
+		end
+		
+		for _,player_boxes in pairs(self.boxes) do
+			if #player_boxes > 0 then
+				return
+			end
+		end
+		flow(function()
+			flow.delay(2)
+			msg.post("main:/main", "game_over", self.players)
+		end)
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

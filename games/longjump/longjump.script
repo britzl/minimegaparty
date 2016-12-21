@@ -9,7 +9,6 @@ function on_message(self, message_id, message, sender)
 		self.players = message
 		for _,player in ipairs(self.players) do
 			player.win = false
-			player.id = hash("/player" .. player.player_id)
 			go.set("player" .. player.player_id .. "#script", "action_id", player.action_id)
 			label.set_text("player" .. player.player_id .. "#action", player.action_name)
 		end
@@ -21,7 +20,7 @@ function on_message(self, message_id, message, sender)
 		end)
 	elseif message_id == hash("trigger_response") then
 		for _,player in pairs(self.players) do
-			if player.id == message.other_id then
+			if message.other_id == hash("player" .. player.player_id) then
 				player.win = true
 			end
 		end

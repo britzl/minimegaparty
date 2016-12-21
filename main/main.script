@@ -7,7 +7,16 @@ local GAMES = {
 	{ proxy = "#longjump_proxy", script = "longjump:/game#script" },
 	{ proxy = "#stoprotation_proxy", script = "stoprotation:/game#script" },
 	{ proxy = "#shoot_proxy", script = "shoot:/game#script" },
+	{ proxy = "#stack_proxy", script = "stack:/game#script" },
 }
+
+local function shuffle(t)
+	for n=1,#t do
+		local k = math.random(#t)
+		t[n], t[k] = t[k], t[n]
+	end
+	return t
+end
 
 
 function init(self)
@@ -20,22 +29,25 @@ function init(self)
 		local players = message
 		flow.unload("#select_players_proxy")
 		while true do
-			local game = GAMES[math.random(1, #GAMES)]
-			flow.load(game.proxy)
-			msg.post(game.script, "start", players)
-			local message_id, message, sender = flow.until_message(hash("game_over"))
-			players = message
-			for _,player in pairs(players) do
-				if player.win then
-					player.score = player.score + 1
+			GAMES = shuffle(GAMES)
+			pprint(GAMES)
+			for _, game in ipairs(GAMES) do
+				flow.load(game.proxy)
+				msg.post(game.script, "start", players)
+				local message_id, message, sender = flow.until_message(hash("game_over"))
+				players = message
+				for _,player in pairs(players) do
+					if player.win then
+						player.score = player.score + 1
+					end
 				end
+				flow.unload(game.proxy)
+	
+				flow.load("#scoreboard_proxy")
+				msg.post("scoreboard:/scoreboard", "players", players)
+				flow.until_message(hash("next_game"))
+				flow.unload("#scoreboard_proxy")
 			end
-			flow.unload(game.proxy)
-
-			flow.load("#scoreboard_proxy")
-			msg.post("scoreboard:/scoreboard", "players", players)
-			flow.until_message(hash("next_game"))
-			flow.unload("#scoreboard_proxy")
 		end
 	end)
 end
