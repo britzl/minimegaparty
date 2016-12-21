@@ -1,0 +1,6 @@
+go.property("direction", vmath.vector3())
+go.property("speed", 200)
+
+function update(self, dt)
+	go.set_position(go.get_position() + self.direction * self.speed * dt)
+end

@@ -1,0 +1,34 @@
+
+function init(self)
+	self.players = {}
+	--msg.post(".", "start", { { action_id = hash("KEY_Q"), player_id = 1, action_name = "Q" } })
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start") then
+		self.players = message
+		for _,player in ipairs(self.players) do
+			player.win = false
+			player.id = hash("/player" .. player.player_id)
+			go.set("player" .. player.player_id .. "#script", "action_id", player.action_id)
+			label.set_text("player" .. player.player_id .. "#action", player.action_name)
+		end
+		for i=#self.players+1,4 do
+			go.delete("player" .. i)
+		end
+		go.animate(".", "position.x", go.PLAYBACK_ONCE_FORWARD, -1600, go.EASING_LINEAR, 5, 1, function()
+			msg.post("main:/main", "game_over", self.players)
+		end)
+	elseif message_id == hash("trigger_response") then
+		for _,player in pairs(self.players) do
+			if player.id == message.other_id then
+				player.win = true
+			end
+		end
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

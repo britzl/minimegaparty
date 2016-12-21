@@ -1,0 +1,68 @@
+local input = require "ludobits.m.input"
+local flow = require "ludobits.m.flow"
+
+
+
+function init(self)
+	self.players = {}
+	--msg.post(".", "start", { { action_id = hash("KEY_Q"), player_id = 1, action_name = "Q" } })
+end
+
+function final(self)
+	input.release()
+end
+
+function update(self, dt)
+	flow.update(dt)
+	for i,player in pairs(self.players) do
+		if player.shoot and not player.win then
+			local bullet = go.get_world_position("bullet" .. i)
+			local target = go.get_world_position("target" .. i)
+			local distance = vmath.length(bullet - target)
+			if distance < 20 then
+				go.delete("bullet" .. i)
+				go.delete("target" .. i)
+				player.win = true
+			end
+		end
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
+	if message_id == hash("start") then
+		input.acquire()
+		self.players = message
+		for _,player in ipairs(self.players) do
+			player.win = false
+			player.shoot = false
+			player.id = hash("/player" .. player.player_id)
+			label.set_text("player" .. player.player_id .. "#action", player.action_name)
+			go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
+		end
+		for i=#self.players+1,4 do
+			go.delete("player" .. i)
+			go.delete("target" .. i)
+		end
+		flow(function()
+			flow.delay(#self.players * 2.25)
+			msg.post("main:/main", "game_over", self.players)
+		end)
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.released then
+		for i,player in pairs(self.players) do
+			if player.action_id == action_id and not player.shoot then
+				player.shoot = true
+				go.animate("bullet" .. i, "position.y", go.PLAYBACK_ONCE_FORWARD, 800, go.EASING_LINEAR, 2, 0)
+			end
+		end
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

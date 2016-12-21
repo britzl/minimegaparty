@@ -1,0 +1,84 @@
+local input = require "ludobits.m.input"
+local flow = require "ludobits.m.flow"
+
+local THRESHOLD = 20
+
+local function lerp(from, to, t)
+	return from + (to - from) * t
+end
+
+
+function init(self)
+	self.players = {}
+	self.lollipops = {
+		{ angle = 0, angular_velocity = 360, id = "lollipop1" },
+		{ angle = 40, angular_velocity = 360, id = "lollipop2" },
+		{ angle = 80, angular_velocity = 360, id = "lollipop3" },
+		{ angle = 120, angular_velocity = 360, id = "lollipop4" },
+	}
+	--msg.post(".", "start", { { action_id = hash("KEY_Q"), player_id = 1, action_name = "Q" } })
+end
+
+function final(self)
+	input.release()
+end
+
+function update(self, dt)
+	flow.update(dt)
+	for i,lollipop in ipairs(self.lollipops) do
+		lollipop.angle = (lollipop.angle + lollipop.angular_velocity * dt) % 360
+		if self.players[i] and self.players[i].win then
+			if lollipop.angle <= THRESHOLD then
+				lollipop.angle = lerp(lollipop.angle, 0, 0.1)
+			else
+				lollipop.angle = lerp(lollipop.angle, 360, 0.1)
+			end
+		end
+		go.set_rotation(vmath.quat_rotation_z(math.rad(lollipop.angle)), lollipop.id)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
+	if message_id == hash("start") then
+		input.acquire()
+		self.players = message
+		for _,player in ipairs(self.players) do
+			player.win = false
+			player.id = hash("/player" .. player.player_id)
+			label.set_text("player" .. player.player_id .. "#action", player.action_name)
+			go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
+		end
+		for i=#self.players+1,4 do
+			go.delete("player" .. i)
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action.released then
+		for i,player in pairs(self.players) do
+			if player.action_id == action_id then
+				local lollipop = self.lollipops[i]
+				lollipop.angular_velocity = 0
+				player.win = lollipop.angle >= (360 - THRESHOLD) or lollipop.angle <= THRESHOLD
+				msg.post("lollipop" .. i, "play_animation", { id = player.win and hash("lollipop_green") or hash("lollipop_red") })
+			end
+		end
+		
+		for i=1,#self.players do
+			if self.lollipops[i].angular_velocity ~= 0 then
+				return
+			end
+		end
+		flow(function()
+			flow.delay(2)
+			msg.post("main:/main", "game_over", self.players)
+		end)
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

@@ -1,0 +1,64 @@
+local flow = require "ludobits.m.flow"
+local input = require "ludobits.m.input"
+local broadcast = require "ludobits.m.broadcast"
+
+local GAMES = {
+	{ proxy = "#hurdles_proxy", script = "hurdles:/game#script" },
+	{ proxy = "#longjump_proxy", script = "longjump:/game#script" },
+	{ proxy = "#stoprotation_proxy", script = "stoprotation:/game#script" },
+	{ proxy = "#shoot_proxy", script = "shoot:/game#script" },
+}
+
+
+function init(self)
+	math.randomseed(os.time())
+	input.acquire()
+	
+	flow(function()
+		flow.load("#select_players_proxy")
+		local message_id, message, sender = flow.until_message(hash("players_selected"))
+		local players = message
+		flow.unload("#select_players_proxy")
+		while true do
+			local game = GAMES[math.random(1, #GAMES)]
+			flow.load(game.proxy)
+			msg.post(game.script, "start", players)
+			local message_id, message, sender = flow.until_message(hash("game_over"))
+			players = message
+			for _,player in pairs(players) do
+				if player.win then
+					player.score = player.score + 1
+				end
+			end
+			flow.unload(game.proxy)
+
+			flow.load("#scoreboard_proxy")
+			msg.post("scoreboard:/scoreboard", "players", players)
+			flow.until_message(hash("next_game"))
+			flow.unload("#scoreboard_proxy")
+		end
+	end)
+end
+
+function final(self)
+	input.release()
+	flow.stop()
+end
+
+function update(self, dt)
+	flow.update(dt)
+	msg.post("@render:", "clear_color", { color = vmath.vector4(95 /256, 129 / 256, 161 / 256, 1 ) })
+end
+
+function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
+end
+
+function on_input(self, action_id, action)
+	input.on_input(action_id, action)
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

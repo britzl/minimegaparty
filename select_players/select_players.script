@@ -1,0 +1,50 @@
+local input = require "ludobits.m.input"
+local broadcast = require "ludobits.m.broadcast"
+
+
+function init(self)
+	input.acquire()
+	self.players = {}
+	self.available_actions = {}
+	for c=65,90 do
+		local char = string.char(c)
+		self.available_actions[hash("KEY_" .. char)] = char
+	end
+
+	msg.post("#done", "disable")
+end
+
+function final(self)
+	input.release()
+end
+
+function on_input(self, action_id, action)
+	if action.released then
+		if action_id == hash("touch") then
+			if action.x > 1100 and #self.players > 0 then
+				msg.post("main:/main", "players_selected", self.players)
+			end
+		else
+			if self.available_actions[action_id] and #self.players < 4 then
+				local action_name = self.available_actions[action_id]
+				self.available_actions[action_id] = nil
+				local player = {
+					player_id = #self.players + 1,
+					action_id = action_id,
+					action_name = action_name,
+					score = 0,
+				}
+				table.insert(self.players, player)
+				
+				label.set_text("player" .. player.player_id .. "#action", action_name)
+				go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
+				msg.post("#done", "enable")
+			end
+		end
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end

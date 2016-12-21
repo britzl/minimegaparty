@@ -1,0 +1,44 @@
+go.property("player_id", 0)
+go.property("action_id", hash(""))
+
+local input = require "ludobits.m.input"
+local platformer = require "ludobits.m.platformer"
+
+function init(self)
+	input.acquire()
+	self.platformer = platformer.create({ hash("ground") })
+	self.platformer.gravity = -1250
+	msg.post("#sprite", "play_animation", { id = hash("p" .. self.player_id .. "_walk") })
+end
+
+function final(self)
+	input.release()
+end
+
+function update(self, dt)
+	self.platformer.update(dt)
+end
+
+function on_message(self, message_id, message, sender)
+	self.platformer.on_message(message_id, message, sender)
+	if message_id == hash("collision_response") then
+		if message.group == hash("danger") then
+			go.delete()
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == self.action_id then
+		if action.pressed then
+			self.platformer.jump(450)
+		elseif action.released then
+			self.platformer.abort_jump()
+		end
+	end
+end
+
+function on_reload(self)
+    -- Add reload-handling code here
+    -- Remove this function if not needed
+end
