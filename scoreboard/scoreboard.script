@@ -1,24 +1,39 @@
 local input = require "ludobits.m.input"
+local flow = require "ludobits.m.flow"
+
 
 function init(self)
 	input.acquire()
-	print(msg.url())
+	--msg.post(".", "players", { { player_id = 1, score = 3, win = true }, { player_id = 2, score = 3, win = true } })
 end
 
 function final(self)
 	input.release()
+	flow.stop()
+end
+
+function update(self, dt)
+	flow.update(dt)
 end
 
 function on_message(self, message_id, message, sender)
+	flow.on_message(message_id, message, sender)
 	if message_id == hash("players") then
 		self.players = message
 		for _,player in ipairs(self.players) do
 			if player.win then
 				label.set_text("player" .. player.player_id .. "#action", "+1\n" .. tostring(player.score or 0))
+				flow(function()
+					flow.go_animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
+					while true do
+						flow.delay(math.random(18, 22) / 100)
+						msg.post("player" .. player.player_id, "jump")
+					end
+				end)
 			else
+				go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
 				label.set_text("player" .. player.player_id .. "#action", " \n" .. tostring(player.score or 0))
 			end
-			go.animate("player" .. player.player_id, "position.y", go.PLAYBACK_ONCE_FORWARD, 31, go.EASING_INQUAD, 0.4)
 		end
 		for i=#self.players+1,4 do
 			go.delete("player" .. i)
@@ -34,6 +49,4 @@ function on_input(self, action_id, action)
 end
 
 function on_reload(self)
-    -- Add reload-handling code here
-    -- Remove this function if not needed
 end

@@ -1,14 +1,74 @@
 go.property("player_id", 0)
-go.property("action_id", hash(""))
+go.property("action_id", hash("KEY_Q"))
+go.property("jump_power", 450)
+go.property("run", true)
+go.property("play_sound", true)
 
 local input = require "ludobits.m.input"
 local platformer = require "ludobits.m.platformer"
+
+local state_manager = {
+	states = {}
+}
+
+function state_manager.create()
+	
+	local instance = {
+		states = {}
+	}
+	
+	function instance.add(state, value, on_change)
+		instance.states[state] = { value = value, on_change = on_change }
+	end
+	
+	function instance.update(state,  value)
+		assert(instance.states[state])
+		local prev_value = instance.states[state].value
+		instance.states[state].value = value
+		if prev_value ~= value then
+			instance.states[state].on_change(value)
+		end
+	end
+	
+	return instance
+end
+
+
+
+
+local function play_animation(self, name)
+	msg.post("#sprite", "play_animation", { id = hash("p" .. self.player_id .. "_" .. name) })
+end
+
+local function jump(self)
+	self.platformer.jump(self.jump_power)
+	if self.play_sound then
+		msg.post("#jumpsound", "play_sound", { delay = 0, gain = math.random(8, 10) / 10 })
+	end
+	play_animation(self, "jump")
+end
 
 function init(self)
 	input.acquire()
 	self.platformer = platformer.create({ hash("ground") })
 	self.platformer.gravity = -1250
-	msg.post("#sprite", "play_animation", { id = hash("p" .. self.player_id .. "_walk") })
+	
+	self.sm = state_manager.create()
+	self.sm.add("JUMPING", false, function(jumping)
+		if jumping then
+			play_animation(self, "jump")
+		end
+	end)
+	self.sm.add("FALLING", false, function(falling)
+		if falling then
+			--print("falling")
+		end
+	end)
+	self.sm.add("GROUND_CONTACT", false, function(ground_contact)
+		if ground_contact then
+			play_animation(self, self.run and "walk" or "idle")
+		end
+	end)
 end
 
 function final(self)
@@ -16,6 +76,15 @@ function final(self)
 end
 
 function update(self, dt)
+	if self.jump then
+		jump(self)
+		self.jump = false
+	end
+	
+	self.sm.update("JUMPING", self.platformer.is_jumping())
+	self.sm.update("FALLING", self.platformer.is_falling())
+	self.sm.update("GROUND_CONTACT", self.platformer.ground_contact)
+
 	self.platformer.update(dt)
 end
 
@@ -25,14 +94,15 @@ function on_message(self, message_id, message, sender)
 		if message.group == hash("danger") then
 			go.delete()
 		end
+	elseif message_id == hash("jump") then
+		self.jump = true
 	end
 end
 
 function on_input(self, action_id, action)
 	if action_id == self.action_id then
 		if action.pressed then
-			self.platformer.jump(450)
-			msg.post("#jumpsound", "play_sound", { delay = 0, gain = math.random(8, 10) / 10 })
+			jump(self, self.jump_power)
 		elseif action.released then
 			self.platformer.abort_jump()
 		end

@@ -10,6 +10,7 @@ local GAMES = {
 	{ proxy = "#stoprotation_proxy", script = "stoprotation:/game#script" },
 	{ proxy = "#shoot_proxy", script = "shoot:/game#script" },
 	{ proxy = "#stack_proxy", script = "stack:/game#script" },
+	{ proxy = "#minigolf_proxy", script = "minigolf:/game#script" },
 }
 
 local function shuffle(t)
