@@ -45,7 +45,7 @@ function init(self)
 		flow.unload("#select_players_proxy")
 		while true do
 			GAMES = shuffle(GAMES)
-			pprint(GAMES)
+			--pprint(GAMES)
 			for _, game in ipairs(GAMES) do
 				flow.load(game.proxy)
 				fade_in_music()
