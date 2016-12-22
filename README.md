@@ -8,4 +8,5 @@ You can play up to four players at the same time. Each players picks a key (A-Z)
 https://britzl.github.io/MiniMegaParty/
 
 # Credits
-Graphics by [Kenney](http://www.kenney.nl)
+* Graphics by [Kenney](http://www.kenney.nl)
+* Music by [Ozzed](http://ozzed.net/)
