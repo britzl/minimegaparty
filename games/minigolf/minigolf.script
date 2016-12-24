@@ -23,7 +23,6 @@ end
 function on_message(self, message_id, message, sender)
 	flow.on_message(message_id, message, sender)
 	if message_id == hash("start") then
-		input.acquire()
 		self.players = message
 		for _,player in ipairs(self.players) do
 			player.win = false

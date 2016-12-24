@@ -5,12 +5,13 @@ local input = require "ludobits.m.input"
 local broadcast = require "ludobits.m.broadcast"
 
 local GAMES = {
-	{ proxy = "#hurdles_proxy", script = "hurdles:/game#script" },
+	--[[{ proxy = "#hurdles_proxy", script = "hurdles:/game#script" },
 	{ proxy = "#longjump_proxy", script = "longjump:/game#script" },
 	{ proxy = "#stoprotation_proxy", script = "stoprotation:/game#script" },
 	{ proxy = "#shoot_proxy", script = "shoot:/game#script" },
 	{ proxy = "#stack_proxy", script = "stack:/game#script" },
-	{ proxy = "#minigolf_proxy", script = "minigolf:/game#script" },
+	{ proxy = "#minigolf_proxy", script = "minigolf:/game#script" },--]]
+	{ proxy = "#snowfight_proxy", script = "snowfight:/game#script" },
 }
 
 local function shuffle(t)

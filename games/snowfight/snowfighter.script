@@ -1,0 +1,8 @@
+go.property("team", hash("left"))
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("collision_response") and message.group == hash("ball") then
+		msg.post(message.other_id, "disable")
+		msg.post("snowfight:/game", "snowballhit", { team = self.team })
+	end
+end

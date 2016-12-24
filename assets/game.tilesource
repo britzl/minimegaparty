@@ -2333,72 +2333,72 @@ convex_hulls {
 convex_hulls {
   index: 3842
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3846
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3854
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3860
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3864
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3870
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3878
   count: 3
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3881
   count: 3
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3884
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3892
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3898
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3906
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3914
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3922
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 3930
@@ -2488,47 +2488,47 @@ convex_hulls {
 convex_hulls {
   index: 4044
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4050
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4054
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4060
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4068
   count: 8
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4076
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4080
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4084
   count: 4
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4088
   count: 6
-  collision_group: ""
+  collision_group: "ground"
 }
 convex_hulls {
   index: 4094
@@ -4742,6 +4742,15 @@ animations {
   end_tile: 120
   playback: PLAYBACK_LOOP_FORWARD
   fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "snowball"
+  start_tile: 508
+  end_tile: 508
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 30
   flip_horizontal: 0
   flip_vertical: 0
 }
